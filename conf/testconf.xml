@@ -1,0 +1,18 @@
+<conf>
+	<theme>testtheme</theme>
+	<extensions>
+		<snes>smc</snes>
+		<snes>sfc</snes>
+		<snes>bin</snes>
+		<gb>gb</gb>
+		<gb>sgb</gb>
+		<bsx>bs</bsx>
+		<sufami>st</sufami>
+	</extensions>
+	<controls>
+		<Port1>
+			<GamePad>
+			</GamePad>
+		</Port1>
+	</controls>
+</conf>

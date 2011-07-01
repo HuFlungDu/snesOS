@@ -1,0 +1,44 @@
+<window>
+	<name>Core install window</name>
+	<w>1</w>
+	<h>1</h>
+	<windowborder>
+		<x>-1</x>
+		<y>.8</y>
+		<w>2</w>
+		<h>.2</h>
+		<exitbutton>
+			<x>.9</x>
+			<y>-1</y>
+			<w>.1</w>
+			<h>2</h>
+		</exitbutton>
+	</windowborder>
+	<textbox>
+		<name>Core</name>
+		<editable>False</editable>
+		<text>Core file</text>
+		<x>-.99</x>
+		<y>.6</y>
+		<w>1.4</w>
+		<h>.1</h>
+	</textbox>
+		<textbox>
+		<name>Cython</name>
+		<editable>False</editable>
+		<text>Cython file</text>
+		<x>-.99</x>
+		<y>.4</y>
+		<w>1.4</w>
+		<h>.1</h>
+	</textbox>
+	<textbox>
+		<name>Name</name>
+		<editable>True</editable>
+		<text>Core name</text>
+		<x>-.99</x>
+		<y>.2</y>
+		<w>1.4</w>
+		<h>.1</h>
+	</textbox>
+</window>

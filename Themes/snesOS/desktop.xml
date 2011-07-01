@@ -1,0 +1,77 @@
+<desktop>
+	<name>snesOSdesktop</name>
+	<x>-1</x>
+	<y>-1</y>
+	<w>2</w>
+	<h>2</h>
+	<taskbar>
+		<name>BottomTaskbar</name>
+		<x>-1</x>
+		<y>-1</y>
+		<w>2</w>
+		<h>.05</h>
+		<menu>
+			<name>Mainmenu</name>
+			<x>-1</x>
+			<y>-1</y>
+			<w>.5</w>
+			<h>2</h>
+			<menuitem>
+				<name>system</name>
+				<label>system</label>
+				<x>-1</x>
+				<y>-1</y>
+				<w>.5</w>
+				<h>2</h>
+				<action>self.makedropdown(button,state,x,y)</action>
+				<dropdownmenu>
+					<elementh>.08</elementh>
+					<dmenuitem>
+						<name>Install core</name>
+						<label>Install core</label>
+						<action>makewindow(self,ReadFile("Themes/"+snes.DE.theme+"/windows/coreinstall.xml"))</action>
+					</dmenuitem>
+					<dmenuitem>
+						<name>submenu test</name>
+						<label>submenu test</label>
+						<action>self.makedropdown(button,state,x,y)</action>
+						<dropdownmenu>
+							<elementh>.08</elementh>
+							<dmenuitem>
+								<name>Test</name>
+								<label>change user</label>
+								<action>snes.DE.changeuser("test")</action>
+							</dmenuitem>
+						</dropdownmenu>
+					</dmenuitem>
+				</dropdownmenu>
+			</menuitem>
+			<menuitem>
+				<name>preferences</name>
+				<label>preferences</label>
+				<x>-.50</x>
+				<y>-1</y>
+				<w>.8</w>
+				<h>2</h>
+				<action>pass</action>
+			</menuitem>
+			<menuitem>
+				<name>places</name>
+				<label>places</label>
+				<x>.3</x>
+				<y>-1</y>
+				<w>.45</w>
+				<h>2</h>
+				<action>self.makedropdown(button,state,x,y)</action>
+				<dropdownmenu>
+					<elementh>.08</elementh>
+					<dmenuitem>
+						<name>Open File Window</name>
+						<label>Open File Window</label>
+						<action>makewindow(self,ReadFile("Themes/"+snes.DE.theme+"/windows/filewindow.xml"))</action>
+					</dmenuitem>
+				</dropdownmenu>
+			</menuitem>
+		</menu>
+	</taskbar>
+</desktop>

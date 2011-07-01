@@ -1,0 +1,38 @@
+<window>
+	<name>File window</name>
+	<w>1</w>
+	<h>1</h>
+	<windowborder>
+		<x>-1</x>
+		<y>.8</y>
+		<w>2</w>
+		<h>.2</h>
+		<exitbutton>
+			<x>.9</x>
+			<y>-1</y>
+			<w>.1</w>
+			<h>2</h>
+		</exitbutton>
+	</windowborder>
+	<menu>
+		<name>filewindowmenu</name>
+		<x>-.99</x>
+		<y>.7</y>
+		<w>1.98</w>
+		<h>.1</h>
+		<menuitem>
+			<name>file</name>
+			<x>-1</x>
+			<y>-1</y>
+			<w>.9</w>
+			<h>2</h>
+			<action>pass</action>
+		</menuitem>
+	</menu>
+	<fileview>
+		<x>-.99</x>
+		<y>-.99</y>
+		<w>1.98</w>
+		<h>1.69</h>
+	</fileview>
+</window>
