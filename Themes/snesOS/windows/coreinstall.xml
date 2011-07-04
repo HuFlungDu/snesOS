@@ -1,12 +1,12 @@
 <window>
 	<name>Core install window</name>
 	<w>1</w>
-	<h>1</h>
+	<h>.4</h>
 	<windowborder>
 		<x>-1</x>
-		<y>.8</y>
+		<y>.5</y>
 		<w>2</w>
-		<h>.2</h>
+		<h>.5</h>
 		<exitbutton>
 			<x>.9</x>
 			<y>-1</y>
@@ -17,28 +17,26 @@
 	<textbox>
 		<name>Core</name>
 		<editable>False</editable>
-		<text>Core file</text>
+		<text>Core File</text>
 		<x>-.99</x>
-		<y>.6</y>
+		<y>.1</y>
 		<w>1.4</w>
-		<h>.1</h>
+		<h>.25</h>
 	</textbox>
-		<textbox>
-		<name>Cython</name>
-		<editable>False</editable>
-		<text>Cython file</text>
-		<x>-.99</x>
-		<y>.4</y>
-		<w>1.4</w>
-		<h>.1</h>
-	</textbox>
+	<button>
+		<name>FindCore</name>
+		<label>browse</label>
+		<x>.5</x>
+		<y>.1</y>
+		<h>.25</h>
+	</button>
 	<textbox>
 		<name>Name</name>
 		<editable>True</editable>
 		<text>Core name</text>
 		<x>-.99</x>
-		<y>.2</y>
+		<y>-.7</y>
 		<w>1.4</w>
-		<h>.1</h>
+		<h>.25</h>
 	</textbox>
 </window>
