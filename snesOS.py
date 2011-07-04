@@ -12,6 +12,7 @@ import audiere
 import traceback
 import Image
 import numpy
+import snes_core
 from freetype import *
 
 letterkeys = {sf.Key.A:'a',
@@ -721,8 +722,7 @@ class afile:
                     if timedif < 1.0:
                         #print self.extension
                         if self.extension in snes.DE.snesextensions:
-                            #print self.parent.dir + self.name
-                            snes.initsnes("libPysnes")
+                            snes.initsnes("snesperformance.dll")
                             snes.loadsnesgame(self.parent.dir + self.name)
                     return True
         return False
@@ -1181,6 +1181,104 @@ class windowborder:
         self.MainVertexData = MakeBuffer(GL_ARRAY_BUFFER,MainVertexData,len(MainVertexData)*8)
         for i in self.items:
             i.updatevertex()
+
+class button:
+    global snes
+    def __init__(self,parent,button):
+        if isinstance(button,str):
+            self.button = ET.XML(button)
+        else:
+            self.button = button
+        self.parent = parent
+        self.name = self.button[0].text
+        self.label = self.button[1].text
+        self.relx = float(self.button[2].text)
+        self.rely = float(self.button[3].text)
+        self.relh = float(self.button[4].text)
+        self.x = (self.relx+1)*(parent.w/2)+(parent.x+1)-1
+        self.y = (self.rely+1)*(parent.h/2)+(parent.y+1)-1
+        
+        #self.w = (self.relx+self.relw+1)*(parent.w/2)+(parent.x+1)-1 - self.x
+        font = snes.DE.font
+        self.w = font.w*2 + font.w*len(self.label)
+        self.h = (self.rely+self.relh+1)*(parent.h/2)+(parent.y+1)-1 - self.y
+        MainVertexData = numpy.array([self.x,self.y+self.h,0,1,
+                                      self.x+self.w,self.y+self.h,0,1,
+                                      self.x,self.y,0,1,
+                                      self.x+self.w,self.y,0,1,],
+                                     numpy.float32)
+        RelativeVertexData = numpy.array([0,0,1,0,0,1,1,1],
+                                     numpy.float32)
+        FullWindowVertices = numpy.array([0,1,2,3],numpy.ushort)
+        self.MainVertexData = MakeBuffer(GL_ARRAY_BUFFER,MainVertexData,len(MainVertexData)*4)
+        self.RelativeVertexData = MakeBuffer(GL_ARRAY_BUFFER,RelativeVertexData,len(RelativeVertexData)*4)
+        self.FullWindowVertices = MakeBuffer(GL_ELEMENT_ARRAY_BUFFER,FullWindowVertices,len(FullWindowVertices)*2)
+        self.BaseProgram = compileProgram(compileShader(ReadFile("Shaders/Mainv.glsl"),
+                                         GL_VERTEX_SHADER),
+                                         compileShader(ReadFile("Shaders/Mainf.glsl"),
+                                         GL_FRAGMENT_SHADER))
+        self.Tex = snes.DE.buttonouttex
+    def draw(self):
+        glUseProgram(self.BaseProgram)
+        pos = glGetAttribLocation(self.BaseProgram, "position")
+        rpos = glGetAttribLocation(self.BaseProgram, "relativeposition")
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, self.Tex)
+        glUniform1i(glGetUniformLocation(self.BaseProgram,"texture"), 0)
+        
+        glBindBuffer(GL_ARRAY_BUFFER,self.MainVertexData)
+        glVertexAttribPointer(pos,
+                              4,
+                              GL_FLOAT,
+                              GL_FALSE,
+                              16,
+                              None)
+        glBindBuffer(GL_ARRAY_BUFFER,self.RelativeVertexData)
+        glVertexAttribPointer(rpos,
+                              2,
+                              GL_FLOAT,
+                              GL_FALSE,
+                              8,
+                              None)
+        glEnableVertexAttribArray(pos)
+        glEnableVertexAttribArray(rpos)
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,self.FullWindowVertices)
+        glDrawElements(GL_TRIANGLE_STRIP,
+                       4,
+                       GL_UNSIGNED_SHORT,
+                       None)
+        glDisableVertexAttribArray(pos)
+        glDisableVertexAttribArray(rpos)
+        self.drawlabel()
+
+    def drawlabel(self):
+        font = snes.DE.font
+        for i in xrange(len(self.label)):
+            x = self.x + font.w + font.w*i
+            y = self.y + self.h*.5 - font.h*.5
+            width = font.w
+            height = font.h
+            font.drawglyph(self.label[i],x,y,width,height,0,0,0,1)
+    def clickaction(self,button,state,x,y):
+        global snes
+        if x >= self.x and x <= self.x+self.w and y >= self.y and y <= self.y + self.h:
+            #snes.DE.kill(self.parent.parent)
+            #glutPostRedisplay()
+            return True
+    def updatevertex(self):
+        font = snes.DE.font
+        self.x = (self.relx+1)*(self.parent.w/2)+(self.parent.x+1)-1
+        self.y = (self.rely+1)*(self.parent.h/2)+(self.parent.y+1)-1
+        self.w = font.w*2 + font.w*len(self.label)
+        self.h = (self.rely+self.relh+1)*(self.parent.h/2)+(self.parent.y+1)-1 - self.y
+        MainVertexData = numpy.array([self.x,self.y+self.h,0,1,
+                                      self.x+self.w,self.y+self.h,0,1,
+                                      self.x,self.y,0,1,
+                                      self.x+self.w,self.y,0,1,],
+                                     numpy.float32)
+        FullWindowVertices = numpy.array([0,1,2,3],numpy.ushort)
+        self.MainVertexData = MakeBuffer(GL_ARRAY_BUFFER,MainVertexData,len(MainVertexData)*8)
+        
 class ExitButton:
     global snes
     def __init__(self,parent,button):
@@ -1720,6 +1818,7 @@ class Desktop:
         self.wbordertex = TexFromPNG("Themes/"+self.theme+"/windowborder.png")
         #self.renderloadingmessage("Loading button textures...")
         self.exittex = TexFromPNG("Themes/"+self.theme+"/exit.png")
+        self.buttonouttex = TexFromPNG("Themes/"+self.theme+"/buttonout.png")
         #self.renderloadingmessage("Loading menu textures...")
         self.menuitemtex = TexFromPNG("Themes/"+self.theme+"/MenuItem.png")
         self.dmenuitemtex = TexFromPNG("Themes/"+self.theme+"/dmenuitem.png")
@@ -1958,13 +2057,10 @@ class xsnes:
                              ]                          #Port2
                             ]                           #Controllist
         self.running = True
-        exec("from cores import " + core + " as libPysnes")
-        self.libPysnes = libPysnes
-        self.libPysnes.Pysnes_set_video_refresh(self.refresh_video)
-        self.libPysnes.Pysnes_set_audio_sample(self.audio_sample)
-        self.libPysnes.Pysnes_set_input_poll(self.input_poll)
-        self.libPysnes.Pysnes_set_input_state(self.input_state)
-        self.libPysnes.Pysnes_init()
+        self.libPysnes = snes_core.EmulatedSNES("cores/"+core)
+        self.libPysnes.set_video_refresh_cb(self.refresh_video)
+        self.libPysnes.set_audio_sample_cb(self.audio_sample)
+        self.libPysnes.set_input_state_cb(self.input_state)
         self.Desktop = False
         self.Emulator = True
         self.Tex = glGenTextures(1)
@@ -1985,13 +2081,14 @@ class xsnes:
         self.populatecontrols(controls)
         self.keyspressed = []
         
-    def loadsnesgame(self,gamepath, XML = ""):
+    def loadsnesgame(self,gamepath, sram = None, Mapping = None, rtc = None):
         self.romname = gamepath
         self.game = ReadBinaryFile(self.romname)
         if len(self.game)%0x8000:
             self.game = self.game[0x200:]
-        self.libPysnes.Pysnes_unload_cartridge()
-        self.libPysnes.Pysnes_load_cartridge_normal(XML,self.game,len(self.game))
+        if self.libPysnes._cart_loaded:
+            self.libPysnes.unload()
+        self.libPysnes.load_cartridge_normal(self.game)
 
     def draw(self):
         glUseProgram(self.BaseProgram)
@@ -2026,23 +2123,18 @@ class xsnes:
         glDisableVertexAttribArray(rpos)
     def run(self):
         if self.running:
-            self.libPysnes.Pysnes_run()
+            self.libPysnes.run()
         
-    def refresh_video(self,data,width,height):
-        
-        interlace = (height == 448 or height == 478)
-        pitch = 512 if interlace else 1024
-        overscan = (height == 239 or height == 478)
+    def refresh_video(self,data,width,height,hires,interlace,overscan,pitch):
 
         glBindTexture(GL_TEXTURE_2D,self.Tex)
-        snespicbuffer = data.returnnumpyarray()
 
         glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
         glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, pitch, height, 0, GL_BGRA,
-                     GL_UNSIGNED_SHORT_1_5_5_5_REV, snespicbuffer)
+                     GL_UNSIGNED_SHORT_1_5_5_5_REV, data)
 
     def audio_sample(self,left, right):
         self.leftaudio[self.streampos] = left
@@ -2271,7 +2363,8 @@ items = {"desktop" : Desktop,
          "windowborder" : windowborder,
          "exitbutton" : ExitButton,
          "fileview" : fileview,
-         "textbox" : textbox}
+         "textbox" : textbox,
+         "button" : button}
 def makeitem(itemname,args):
     global items
     return items[itemname](*args)
